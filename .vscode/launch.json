@@ -11,13 +11,13 @@
             "mode": "auto",
             "program": "${workspaceFolder}",
             "env": {
-               "SERVER_PORT" : 3000,
-               "PGHOST":"localhost",
-               "PGUSER": "postgres",
-               "PGDATABASE": "coleta",
-               "PGPORT": 5432,
-               "PGPASSWORD": "postgres"
-            },
+                "SERVER_PORT" : 3000,
+                "PGHOST":"cv1p4n0wnzfm.us-east-1.rds.amazonaws.com",
+                "PGUSER": "postgres",
+                "PGDATABASE": "postgres",
+                "PGPORT": 5432,
+                "PGPASSWORD": "postgres"
+             },
             "args": []
         }
     ]
