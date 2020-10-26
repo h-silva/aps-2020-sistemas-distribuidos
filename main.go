@@ -12,7 +12,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 	"github.com/lib/pq"
+	"github.com/xi2/httpgzip"
 	sqltrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/database/sql"
 )
 
@@ -39,8 +42,16 @@ func init() {
 }
 
 func main() {
+	router := mux.NewRouter()
+	headersOk := handlers.AllowedHeaders([]string{"Authorization", "Content-Type"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "PUT", "DELETE"})
 
-	http.HandleFunc("/horarios", func(w http.ResponseWriter, r *http.Request) {
+	handler := httpgzip.NewHandler(router, nil)
+	handler = handlers.CORS(originsOk, headersOk, methodsOk)(handler)
+	handler = handlers.LoggingHandler(os.Stdout, handler)
+
+	router.HandleFunc("/horarios", func(w http.ResponseWriter, r *http.Request) {
 
 		cep, _ := strconv.ParseInt(r.URL.Query().Get("cep"), 10, 64)
 
@@ -61,7 +72,7 @@ func main() {
 		w.Write(data)
 	})
 
-	http.HandleFunc("/cadastrar", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/cadastrar", func(w http.ResponseWriter, r *http.Request) {
 
 		var err error
 		var coletas []Coleta
@@ -91,7 +102,7 @@ func main() {
 
 	})
 
-	log.Fatal(http.ListenAndServe(":5000", nil))
+	log.Fatal(http.ListenAndServe(":5000", handler))
 
 }
 
